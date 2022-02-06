@@ -1,1 +1,2 @@
-# video-processor-MP4-to-GIF
+# Video Processor for MP4-to-GIF
+
