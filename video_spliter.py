@@ -38,8 +38,8 @@ def handler(video_dir, video_path, time_str):
 
 def run(video_list, file_id):
 
-    # 切割一段 00 00 00 10  开始时间00 00 00    时长10
-    # 切割多段 00 00 00 10,00 00 00 20,00 00 00 30
+    # cut one slice: ["00 00 00 10"] (start time:00 00 00  duration:10)
+    # multi-cut:  ["00 00 00 10", "00 00 00 20", "00 00 00 30"]
     duration_list = ["00 00 00 10", "00 00 00 20", "00 00 00 30"]
 
     for time_duration in duration_list:
