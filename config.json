@@ -1,0 +1,7 @@
+{
+    "timeout": 60,
+    "memory": 512,
+    "languages": ["python"],
+    "duration": 2,
+    "video_dir": "./resources"
+}
