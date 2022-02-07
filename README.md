@@ -13,7 +13,8 @@ We are going to use ffmpeg for codec, and slice the video first and process one 
 <!-- ```bash
 pip install ffmpy3
 ``` -->
-
+Download ffmpeg here: [FFMPEG build](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z),  
+and then put ffmpeg.exe in the root directory.
 
 ## Ref
 
