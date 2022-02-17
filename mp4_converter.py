@@ -1,65 +1,86 @@
-import datetime
+import cv2
 import os
-import stat
-import subprocess
+import glob
+import shutil
+from PIL import Image
 
+# split one original video into multiple small slices
+def split_video(video_absolute_path):
+    video_capture = cv2.VideoCapture(video_absolute_path)
+    
+    original_video_fps = video_capture.get(cv2.CAP_PROP_FPS)
+    original_video_size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    original_video_frame_number = video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
+    print('[Info] Original video info: fps {}  size {} nums {}'.format(original_video_fps, original_video_size, original_video_frame_number))
 
-SCRIPT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+    cur_video_number = 0
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size)
 
-def call_ffmpeg(args):
-    ret = subprocess.run([os.path.join(SCRIPT_DIR, 'ffmpeg'), '-y'] + args,
-            #subprocess might inherit Lambda's input for some reason
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
-    if ret.returncode != 0:
-        print('Invocation of ffmpeg failed!')
-        print('Out: ', ret.stdout.decode('utf-8'))
-        raise RuntimeError()
+    frame_counter = -1
+    sec_per_video = 10  # 10 second per video slice
+    frame_number_of_each_slice = sec_per_video * original_video_fps # frame number of each second
 
-# https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
-def to_gif(video_dir, video_path, duration):
-    output = video_dir+'/tmp/processed-{}.gif'.format(os.path.basename(video_path))
-    call_ffmpeg(["-i", video_path,
-        "-t",
-        "{0}".format(duration),
-        "-vf",
-        "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
-        "-loop", "0",
-        output])
-    return output
+    while video_capture.isOpened():
+        frame_counter += 1
+        success, frame = video_capture.read()
+        if success:
+            if(frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
+                cur_video_writer.write(frame) # append frame in to current video slice
+            else:
+                cur_video_number += 1
+                cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size) # start to write another video slice
+        else:
+            break
+    print("[Info] Splited", cur_video_number, "videos")
+    video_capture.release()
+    return cur_video_number
 
+def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    original_video_name = os.path.basename(cur_video_absolute_path)
+    video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    still_reading, frame = video_capture.read() 
+    frame_counter = 0
+    while still_reading:
+        if frame_counter % key_frame_step == 0:
+            cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+        still_reading, frame = video_capture.read()
+        frame_counter += 1
+    print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
+    images = glob.glob(f"{video_frames_folder_absolute_path}/*.jpg")
+    images.sort()
+    frames = [Image.open(image) for image in images]
+    if frames:
+        frame_one = frames[0]
+        frame_one.save(video_absolute_path[:-4]+".gif", format="GIF", append_images=frames,
+                    save_all=True, duration=50, loop=0)
+    print("[Info] Converte finished", video_absolute_path)
+
+def clean_frame_folder(video_frames_folder_absolute_path):
+    if os.path.exists(video_frames_folder_absolute_path):
+        shutil.rmtree(video_frames_folder_absolute_path) # delete previous results
+    try:
+        os.mkdir(video_frames_folder_absolute_path)
+    except IOError:
+        print("[Error] Can not create output folder")
+        os.exit(0)
 
 def handler(config):
+    key_frame_step = 100 # get one key frame pre 100 frames
     video_path_list = config.get('video_file_list')
-    duration = config.get('duration')
-    output_dir = config.get('video_dir') + '/tmp'
-    video_dir = config.get('video_dir')
-    res = []
-    # # Restore executable permission
-    # ffmpeg_binary = os.path.join(SCRIPT_DIR, 'ffmpeg')
-    # # needed on Azure but read-only filesystem on AWS
-    # try:
-    #     st = os.stat(ffmpeg_binary)
-    #     os.chmod(ffmpeg_binary, st.st_mode | stat.S_IEXEC)
-    # except OSError:
-    #     pass
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    video_base_dir = config.get('video_dir')
+    video_frames_folder_name = config.get('video_frames_folder_name')
+    video_frames_folder_absolute_path = os.path.abspath(os.path.join(video_base_dir, video_frames_folder_name))
 
-    for video_path in video_path_list:
-        process_begin = datetime.datetime.now()
-        output_path = to_gif(video_dir, video_path, duration)
-        process_end = datetime.datetime.now()
+    clean_frame_folder(video_frames_folder_absolute_path)
+    # could covert multiple video
+    for video_absolute_path in video_path_list:
+        splited_video_number = split_video(video_absolute_path)
+        for video_number in range(0, splited_video_number+1):
+            cur_video_absolute_path = video_absolute_path[:-4] + "_"+str(video_number)+".mp4"
+            convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step)
 
-        process_time = (process_end - process_begin) / datetime.timedelta(microseconds=1)
-        res.append({
-            'result': {
-                'bucket': output_path,
-            },
-            'measurement': {
-                'compute_time': process_time
-            }
-        })
-
-    return res
+        convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path)
+    print("[Info] Finished")

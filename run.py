@@ -3,4 +3,4 @@ from mp4_converter import handler
 
 if __name__ == '__main__':
     config_dict = read_config('config.json')
-    print(handler(config_dict))
+    handler(config_dict)
