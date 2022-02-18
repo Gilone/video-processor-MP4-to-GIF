@@ -3,8 +3,11 @@ import os
 import glob
 import shutil
 from PIL import Image
+# from memory_profiler import profile
+from scalene import scalene_profiler, profile
 
 # split one original video into multiple small slices
+@profile
 def split_video(video_absolute_path):
     video_capture = cv2.VideoCapture(video_absolute_path)
     
@@ -36,6 +39,7 @@ def split_video(video_absolute_path):
     video_capture.release()
     return cur_video_number
 
+@profile
 def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
     original_video_name = os.path.basename(cur_video_absolute_path)
     video_capture = cv2.VideoCapture(cur_video_absolute_path)
@@ -48,6 +52,7 @@ def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_pa
         frame_counter += 1
     print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
 
+@profile
 def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
     images = glob.glob(f"{video_frames_folder_absolute_path}/*.jpg")
     images.sort()
@@ -58,6 +63,7 @@ def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
                     save_all=True, duration=50, loop=0)
     print("[Info] Converte finished", video_absolute_path)
 
+@profile
 def clean_frame_folder(video_frames_folder_absolute_path):
     if os.path.exists(video_frames_folder_absolute_path):
         shutil.rmtree(video_frames_folder_absolute_path) # delete previous results
@@ -68,6 +74,7 @@ def clean_frame_folder(video_frames_folder_absolute_path):
         os.exit(0)
 
 def handler(config):
+    scalene_profiler.start()
     key_frame_step = 100 # get one key frame pre 100 frames
     video_path_list = config.get('video_file_list')
     video_base_dir = config.get('video_dir')
@@ -84,3 +91,4 @@ def handler(config):
 
         convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path)
     print("[Info] Finished")
+    scalene_profiler.stop()

@@ -1,0 +1,243 @@
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    65     58.1 MiB     58.1 MiB           1   @profile
+    66                                         def clean_frame_folder(video_frames_folder_absolute_path):
+    67     58.1 MiB      0.0 MiB           1       if os.path.exists(video_frames_folder_absolute_path):
+    68     58.1 MiB      0.0 MiB           1           shutil.rmtree(video_frames_folder_absolute_path) # delete previous results
+    69     58.1 MiB      0.0 MiB           1       try:
+    70     58.1 MiB      0.0 MiB           1           os.mkdir(video_frames_folder_absolute_path)
+    71                                             except IOError:
+    72                                                 print("[Error] Can not create output folder")
+    73                                                 os.exit(0)
+
+
+[Info] Original video info: fps 24.00003840006144  size (1280, 720) nums 2064.0
+[Info] Splited 8 videos
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     9     58.1 MiB     58.1 MiB           1   @profile
+    10                                         def split_video(video_absolute_path):
+    11     62.5 MiB      4.4 MiB           1       video_capture = cv2.VideoCapture(video_absolute_path)
+    12                                             
+    13     62.5 MiB      0.0 MiB           1       original_video_fps = video_capture.get(cv2.CAP_PROP_FPS)
+    14     62.5 MiB      0.0 MiB           1       original_video_size = (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    15     62.5 MiB      0.0 MiB           1       original_video_frame_number = video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
+    16     62.5 MiB      0.0 MiB           1       print('[Info] Original video info: fps {}  size {} nums {}'.format(original_video_fps, original_video_size, original_video_frame_number))
+    17                                         
+    18     62.5 MiB      0.0 MiB           1       cur_video_number = 0
+    19     62.5 MiB      0.0 MiB           1       fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    20     64.2 MiB      1.7 MiB           1       cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size)
+    21                                         
+    22     64.2 MiB      0.0 MiB           1       frame_counter = -1
+    23     64.2 MiB      0.0 MiB           1       sec_per_video = 10  # 10 second per video slice
+    24     64.2 MiB      0.0 MiB           1       frame_number_of_each_slice = sec_per_video * original_video_fps # frame number of each second
+    25                                         
+    26    103.0 MiB   -296.5 MiB        2065       while video_capture.isOpened():
+    27    103.0 MiB   -356.1 MiB        2065           frame_counter += 1
+    28    103.0 MiB   -327.8 MiB        2065           success, frame = video_capture.read()
+    29    103.0 MiB   -357.9 MiB        2065           if success:
+    30    103.0 MiB   -355.0 MiB        2064               if(frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
+    31    103.0 MiB   -285.8 MiB        2056                   cur_video_writer.write(frame) # append frame in to current video slice
+    32                                                     else:
+    33    103.0 MiB     -0.5 MiB           8                   cur_video_number += 1
+    34     96.8 MiB    -61.5 MiB           8                   cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size) # start to write another video slice
+    35                                                 else:
+    36                                                     break
+    37    100.1 MiB     -2.9 MiB           1       print("[Info] Splited", cur_video_number, "videos")
+    38     73.7 MiB    -26.4 MiB           1       video_capture.release()
+    39     73.7 MiB      0.0 MiB           1       return cur_video_number
+
+
+[Info] Read 2 frames from  ./resources\to_live_0.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     63.7 MiB     63.7 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     63.7 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.1 MiB      0.4 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     81.5 MiB     17.5 MiB           1       still_reading, frame = video_capture.read() 
+    46     81.5 MiB      0.0 MiB           1       frame_counter = 0
+    47     83.9 MiB     -2.6 MiB         241       while still_reading:
+    48     83.9 MiB      0.0 MiB         240           if frame_counter % key_frame_step == 0:
+    49     83.9 MiB      0.4 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     83.9 MiB     -0.6 MiB         240           still_reading, frame = video_capture.read()
+    51     83.9 MiB     -2.6 MiB         240           frame_counter += 1
+    52     81.2 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_1.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.1 MiB     64.1 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.1 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.3 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.0 MiB     17.5 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.0 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.1 MiB     -2.6 MiB         240       while still_reading:
+    48     84.1 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.1 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.1 MiB     -0.5 MiB         239           still_reading, frame = video_capture.read()
+    51     84.1 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.5 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_2.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.1 MiB     64.1 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.1 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.3 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.2 MiB     17.7 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.2 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.1 MiB     -2.6 MiB         240       while still_reading:
+    48     84.1 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.1 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.1 MiB     -0.7 MiB         239           still_reading, frame = video_capture.read()
+    51     84.1 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.4 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_3.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.2 MiB     64.2 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.2 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.6 MiB      0.4 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.2 MiB     17.6 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.2 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.1 MiB     -2.6 MiB         240       while still_reading:
+    48     84.1 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.1 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.1 MiB     -0.7 MiB         239           still_reading, frame = video_capture.read()
+    51     84.1 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.5 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_4.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.3 MiB     64.3 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.3 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.2 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.0 MiB     17.5 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.0 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.0 MiB     -2.6 MiB         240       while still_reading:
+    48     84.0 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.0 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.0 MiB     -0.7 MiB         239           still_reading, frame = video_capture.read()
+    51     84.0 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.3 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_5.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.1 MiB     64.1 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.1 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.4 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.2 MiB     17.7 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.2 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.2 MiB     -2.6 MiB         240       while still_reading:
+    48     84.2 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.2 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.2 MiB     -0.6 MiB         239           still_reading, frame = video_capture.read()
+    51     84.2 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.6 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_6.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.2 MiB     64.2 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.2 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.3 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.1 MiB     17.6 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.1 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.2 MiB     -2.6 MiB         240       while still_reading:
+    48     84.2 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.2 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.2 MiB     -0.6 MiB         239           still_reading, frame = video_capture.read()
+    51     84.2 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.6 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 2 frames from  ./resources\to_live_7.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.2 MiB     64.2 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.2 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.6 MiB      0.4 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.2 MiB     17.6 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.2 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.2 MiB     -2.6 MiB         240       while still_reading:
+    48     84.2 MiB      0.0 MiB         239           if frame_counter % key_frame_step == 0:
+    49     84.2 MiB      0.0 MiB           3               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.2 MiB     -0.6 MiB         239           still_reading, frame = video_capture.read()
+    51     84.2 MiB     -2.6 MiB         239           frame_counter += 1
+    52     81.5 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Read 1 frames from  ./resources\to_live_8.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    41     64.1 MiB     64.1 MiB           1   @profile
+    42                                         def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
+    43     64.1 MiB      0.0 MiB           1       original_video_name = os.path.basename(cur_video_absolute_path)
+    44     64.5 MiB      0.4 MiB           1       video_capture = cv2.VideoCapture(cur_video_absolute_path)
+    45     82.2 MiB     17.7 MiB           1       still_reading, frame = video_capture.read() 
+    46     82.2 MiB      0.0 MiB           1       frame_counter = 0
+    47     84.1 MiB     -2.6 MiB         144       while still_reading:
+    48     84.1 MiB      0.0 MiB         143           if frame_counter % key_frame_step == 0:
+    49     84.1 MiB      0.0 MiB           2               cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+    50     84.1 MiB     -0.7 MiB         143           still_reading, frame = video_capture.read()
+    51     84.1 MiB     -2.6 MiB         143           frame_counter += 1
+    52     81.4 MiB     -2.6 MiB           1       print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
+
+
+[Info] Converte finished ./resources\to_live.mp4
+Filename: g:\desktop\RANDOM PROJECT\video-processor-MP4-to-GIF\mp4_converter.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    54     64.2 MiB     64.2 MiB           1   @profile
+    55                                         def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
+    56     64.2 MiB      0.0 MiB           1       images = glob.glob(f"{video_frames_folder_absolute_path}/*.jpg")
+    57     64.2 MiB      0.0 MiB           1       images.sort()
+    58     65.1 MiB      0.9 MiB          29       frames = [Image.open(image) for image in images]
+    59     65.1 MiB      0.0 MiB           1       if frames:
+    60     65.1 MiB      0.0 MiB           1           frame_one = frames[0]
+    61    157.2 MiB     92.1 MiB           2           frame_one.save(video_absolute_path[:-4]+".gif", format="GIF", append_images=frames,
+    62     65.1 MiB      0.0 MiB           1                       save_all=True, duration=50, loop=0)
+    63    157.2 MiB      0.0 MiB           1       print("[Info] Converte finished", video_absolute_path)
+
+
+[Info] Finished

@@ -1,0 +1,74 @@
+{
+    "elapsed_time_sec": 2.3000328540802,
+    "files": {
+        "G:\\desktop\\RANDOM PROJECT\\video-processor-MP4-to-GIF\\mp4_converter.py": {
+            "functions": [],
+            "lines": [
+                {
+                    "line": "import cv2\n",
+                    "lineno": 1,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 11.87039335093813,
+                    "n_cpu_percent_python": 11.109206948884918,
+                    "n_gpu_avg_memory_mb": 415.2497395833335,
+                    "n_gpu_peak_memory_mb": 417.44140625,
+                    "n_gpu_percent": 94.65759075907587,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 71.90254028204158,
+                    "n_usage_fraction": 0
+                },
+                {
+                    "line": "from PIL import Image\n",
+                    "lineno": 5,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.0,
+                    "n_cpu_percent_python": 0.0,
+                    "n_gpu_avg_memory_mb": 413.75390625,
+                    "n_gpu_peak_memory_mb": 413.75390625,
+                    "n_gpu_percent": 3.547854785478548,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 3.52516457846677,
+                    "n_usage_fraction": 0
+                },
+                {
+                    "line": "from scalene import scalene_profiler, profile\n",
+                    "lineno": 7,
+                    "memory_samples": [],
+                    "n_avg_mb": 0.0,
+                    "n_copy_mb_s": 0.0,
+                    "n_cpu_percent_c": 0.0,
+                    "n_cpu_percent_python": 0.0,
+                    "n_gpu_avg_memory_mb": 413.75390625,
+                    "n_gpu_peak_memory_mb": 413.75390625,
+                    "n_gpu_percent": 1.1963696369636965,
+                    "n_growth_mb": 0.0,
+                    "n_malloc_mb": 0.0,
+                    "n_mallocs": 0,
+                    "n_peak_mb": 0.0,
+                    "n_python_fraction": 0,
+                    "n_sys_percent": 1.0617965597791474,
+                    "n_usage_fraction": 0
+                }
+            ],
+            "percent_cpu_time": 99.46910172011043
+        }
+    },
+    "gpu": true,
+    "growth_rate": 0.0,
+    "max_footprint_mb": 0,
+    "memory": false,
+    "program": "run.py",
+    "samples": []
+}

@@ -11,7 +11,8 @@ We are going to use openCV for codec, and slice the video first and process one 
 ## Requirment
 
 <!-- ```bash
-pip install ffmpy3
+python -m pip install ffmpy3
+python -m pip install -U memory_profiler
 ``` -->
 <!-- Download ffmpeg here: [FFMPEG build](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z),  
 and then put ffmpeg.exe in the root directory. -->
