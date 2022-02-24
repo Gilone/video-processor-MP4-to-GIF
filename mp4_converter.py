@@ -26,10 +26,10 @@ def split_video(video_absolute_path):
 
     while video_capture.isOpened():
         frame_counter += 1
-        success, frame = video_capture.read()
+        success, frame = video_capture.read() # split
         if success:
             if(frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
-                cur_video_writer.write(frame) # append frame in to current video slice
+                cur_video_writer.write(frame) # append frame in to current video slice # split
             else:
                 cur_video_number += 1
                 cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size) # start to write another video slice
@@ -43,12 +43,12 @@ def split_video(video_absolute_path):
 def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_path, key_frame_step):
     original_video_name = os.path.basename(cur_video_absolute_path)
     video_capture = cv2.VideoCapture(cur_video_absolute_path)
-    still_reading, frame = video_capture.read() 
+    still_reading, frame = video_capture.read() # split
     frame_counter = 0
     while still_reading:
         if frame_counter % key_frame_step == 0:
             cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
-        still_reading, frame = video_capture.read()
+        still_reading, frame = video_capture.read() # split
         frame_counter += 1
     print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
 
@@ -60,7 +60,7 @@ def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
     if frames:
         frame_one = frames[0]
         frame_one.save(video_absolute_path[:-4]+".gif", format="GIF", append_images=frames,
-                    save_all=True, duration=50, loop=0)
+                    save_all=True, duration=50, loop=0) # split
     print("[Info] Converte finished", video_absolute_path)
 
 @profile
