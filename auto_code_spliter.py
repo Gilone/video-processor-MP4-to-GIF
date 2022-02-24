@@ -79,7 +79,7 @@ def run():
     file_name_line_map = read_config(config_dict)
     for file_path, line_list in file_name_line_map.items():
         script_list = []
-        # line_list = [28, 61] # for text
+        # line_list = [28, 61] # for test
         with open(file_path, 'r') as script_file:
             script_list = script_file.readlines()
             modify_script(script_list, line_list)
