@@ -26,7 +26,7 @@ def split_video(video_absolute_path):
 
     while video_capture.isOpened():
         frame_counter += 1
-        success, frame = video_capture.read() # split
+        success,frame = new_func_line_28(video_capture)
         if success:
             if(frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
                 cur_video_writer.write(frame) # append frame in to current video slice # split
@@ -59,7 +59,7 @@ def convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path):
     frames = [Image.open(image) for image in images]
     if frames:
         frame_one = frames[0]
-        frame_one.save(video_absolute_path[:-4]+".gif", format="GIF", append_images=frames, save_all=True, duration=50, loop=0) # split
+        new_func_line_61(frame_one,video_absolute_path,frames)
     print("[Info] Converte finished", video_absolute_path)
 
 @profile
@@ -91,3 +91,12 @@ def handler(config):
         convert_jpgs_to_gif(video_frames_folder_absolute_path, video_absolute_path)
     print("[Info] Finished")
     scalene_profiler.stop()
+
+def new_func_line_28(video_capture):
+    success,frame=video_capture.read()
+    return success,frame
+    
+def new_func_line_61(frame_one,video_absolute_path,frames):
+    frame_one.save(video_absolute_path[:-4]+".gif",format="GIF",append_images=frames,save_all=True,duration=50,loop=0)
+    return 
+    

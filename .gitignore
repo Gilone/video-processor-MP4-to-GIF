@@ -4,6 +4,7 @@
 *.exe
 *.mp4
 *.jpg
+__pycache__
 ## Dependency directory
 ## Commenting this out is preferred by some people, see
 ## https://docs.npmjs.com/misc/faq#should-i-check-my-node_modules-folder-into-git
