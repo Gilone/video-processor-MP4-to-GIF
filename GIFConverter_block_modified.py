@@ -24,7 +24,7 @@ def split_video(video_absolute_path):
     sec_per_video = 10  # 10 second per video slice
     frame_number_of_each_slice = sec_per_video * original_video_fps # frame number of each second
 
-    frame_number_of_each_slice, fourcc, video_capture, cur_video_writer, video_absolute_path, cur_video_number, original_video_fps, cv2, success, frame, original_video_size, frame_counter = new_func_block_26(frame_number_of_each_slice, fourcc, video_capture, cur_video_writer, video_absolute_path, cur_video_number, original_video_fps, cv2, original_video_size, frame_counter)
+    frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, success, cur_video_number, video_absolute_path, original_video_fps, frame, fourcc = new_func_block_26(frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, cur_video_number, video_absolute_path, original_video_fps, fourcc)
 
 
 
@@ -92,7 +92,7 @@ def run_converter(config):
     print("[Info] Finished")
     scalene_profiler.stop()
 
-def new_func_block_26(frame_number_of_each_slice, fourcc, video_capture, cur_video_writer, video_absolute_path, cur_video_number, original_video_fps, cv2, original_video_size, frame_counter):
+def new_func_block_26(frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, cur_video_number, video_absolute_path, original_video_fps, fourcc):
     while video_capture.isOpened():
         frame_counter += 1
         success, frame = video_capture.read() 
@@ -105,4 +105,4 @@ def new_func_block_26(frame_number_of_each_slice, fourcc, video_capture, cur_vid
         else:
             break
 
-    return frame_number_of_each_slice, fourcc, video_capture, cur_video_writer, video_absolute_path, cur_video_number, original_video_fps, cv2, success, frame, original_video_size, frame_counter
+    return frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, success, cur_video_number, video_absolute_path, original_video_fps, frame, fourcc

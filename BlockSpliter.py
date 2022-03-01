@@ -94,6 +94,7 @@ def get_package_set(script_list):
     for line in script_list:
         if 'import' in line:
             for l in line.split(' '):
+                l = l.strip()
                 if l != 'import' and l != 'from':
                     package_set.add(l)
     return package_set
