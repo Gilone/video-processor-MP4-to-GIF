@@ -24,17 +24,17 @@ def split_video(video_absolute_path):
     sec_per_video = 10  # 10 second per video slice
     frame_number_of_each_slice = sec_per_video * original_video_fps # frame number of each second
 
-    frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, success, cur_video_number, video_absolute_path, original_video_fps, frame, fourcc = new_func_block_26(frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, cur_video_number, video_absolute_path, original_video_fps, fourcc)
-
-
-
-
-
-
-
-
-
-
+    while video_capture.isOpened():
+        frame_counter += 1
+        success, frame = video_capture.read() # split
+        if success:
+            if (frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
+                cur_video_writer.write(frame) # append frame in to current video slice # split
+            else:
+                cur_video_number += 1
+                cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size) # start to write another video slice
+        else:
+            break
     print("[Info] Splited", cur_video_number, "videos")
     video_capture.release()
     return cur_video_number
@@ -45,11 +45,11 @@ def convert_mp4_to_jpgs(cur_video_absolute_path, video_frames_folder_absolute_pa
     video_capture = cv2.VideoCapture(cur_video_absolute_path)
     still_reading, frame = video_capture.read() # split
     frame_counter = 0
-    while still_reading:
-        if frame_counter % key_frame_step == 0:
-            cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
-        still_reading, frame = video_capture.read() # split
-        frame_counter += 1
+    f, video_capture, still_reading, jpg, _, frame, key_frame_step, original_video_name, frame_counter, video_frames_folder_absolute_path = new_func_block_47(f, video_capture, still_reading, jpg, _, frame, key_frame_step, original_video_name, frame_counter, video_frames_folder_absolute_path)
+
+
+
+
     print("[Info] Read", frame_counter//key_frame_step, "frames from ", cur_video_absolute_path)
 
 @profile
@@ -92,17 +92,11 @@ def run_converter(config):
     print("[Info] Finished")
     scalene_profiler.stop()
 
-def new_func_block_26(frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, cur_video_number, video_absolute_path, original_video_fps, fourcc):
-    while video_capture.isOpened():
+def new_func_block_47(f, video_capture, still_reading, jpg, _, frame, key_frame_step, original_video_name, frame_counter, video_frames_folder_absolute_path):
+    while still_reading:
+        if frame_counter % key_frame_step == 0:
+            cv2.imwrite(f"{video_frames_folder_absolute_path}/{original_video_name}_{frame_counter}.jpg", frame)
+        still_reading, frame = video_capture.read() 
         frame_counter += 1
-        success, frame = video_capture.read() 
-        if success:
-            if (frame_counter % frame_number_of_each_slice < frame_number_of_each_slice - 1):
-                cur_video_writer.write(frame) 
-            else:
-                cur_video_number += 1
-                cur_video_writer = cv2.VideoWriter(video_absolute_path[:-4]+"_"+str(cur_video_number)+".mp4", fourcc, original_video_fps, original_video_size) 
-        else:
-            break
 
-    return frame_number_of_each_slice, frame_counter, cur_video_writer, video_capture, original_video_size, success, cur_video_number, video_absolute_path, original_video_fps, frame, fourcc
+    return f, video_capture, still_reading, jpg, _, frame, key_frame_step, original_video_name, frame_counter, video_frames_folder_absolute_path
