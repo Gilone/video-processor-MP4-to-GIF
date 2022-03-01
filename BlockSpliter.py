@@ -118,7 +118,7 @@ def modify_script(script_list, line_list):
 def run_code_block_spliter(file_name_line_map):
     for file_path, line_list in file_name_line_map.items():
         script_list = []
-        line_list = [50] # for test
+        # line_list = [28, 50] # for test
         with open(file_path, 'r') as script_file:
             script_list = script_file.readlines()
             modify_script(script_list, line_list)
