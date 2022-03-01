@@ -1,7 +1,7 @@
 {
     "elapsed_time_sec": 102.52538394927979,
     "files": {
-        "/Users/zouhongyu/Desktop/video-processor-MP4-to-GIF/mp4_converter.py": {
+        "/Users/zouhongyu/Desktop/video-processor-MP4-to-GIF/GIFConverter.py": {
             "functions": [
                 {
                     "line": "split_video",

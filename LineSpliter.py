@@ -1,16 +1,3 @@
-import json, os
-from read_profile_json import parse_scalene_profile_json
-
-def read_config(config_dict):
-    file_name_line_map = {}
-    for file_path, lline_info_dict_list in config_dict.items(): # {"file_1.py":[1,2,3,5], "file_2.py":[25, 36]}
-        file_path = os.path.abspath(file_path)
-        line_list = []
-        for line_info_dict in lline_info_dict_list:
-            line_list.append(int(line_info_dict['line']-1)) # line start from 1, while list start from 0
-        file_name_line_map[file_path] = line_list
-    return file_name_line_map
-
 # ok = frame_one.save(video_absolute_path[:-4]+".gif", format="GIF", append_images=frames,
 #             save_all=True, duration=50, loop=0)   take this as the example
 def generate_func(code_string, function_name):
@@ -74,18 +61,12 @@ def modify_script(script_list, line_list):
         script_list[line] = function_call
         script_list.append(function_body)
 
-def run():
-    config_dict = parse_scalene_profile_json('./profile.json', 20, 2)
-    file_name_line_map = read_config(config_dict)
+def run_code_line_spliter(file_name_line_map):
     for file_path, line_list in file_name_line_map.items():
         script_list = []
         # line_list = [28, 61] # for test
         with open(file_path, 'r') as script_file:
             script_list = script_file.readlines()
             modify_script(script_list, line_list)
-        with open(file_path[:-3]+'_modified.py', 'w') as script_file:
+        with open(file_path[:-3]+'_line_modified.py', 'w') as script_file:
             script_file.writelines(script_list)
-    
-
-if __name__ == "__main__":
-    run()
